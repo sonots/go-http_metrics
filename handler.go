@@ -7,23 +7,20 @@ import (
 
 type Handler struct {
 	Original http.Handler
-	*Metrics
+	metrics  *Metrics
 }
 
-func newHandler(name string, h http.Handler) *Handler {
+func newHandler(h http.Handler, metrics *Metrics) *Handler {
 	return &Handler{
 		h,
-		newMetrics(name),
+		metrics,
 	}
 }
 
 func (proxy *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	var startTime time.Time
 	if Enable {
-		startTime = time.Now()
+		startTime := time.Now()
+		defer proxy.metrics.measure(startTime, r)
 	}
 	proxy.Original.ServeHTTP(w, r)
-	if Enable {
-		defer proxy.measure(startTime, r)
-	}
 }

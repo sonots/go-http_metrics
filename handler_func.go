@@ -9,23 +9,20 @@ type tHttpHandlerFunc func(http.ResponseWriter, *http.Request)
 
 type HandlerFunc struct {
 	Original tHttpHandlerFunc
-	*Metrics
+	metrics  *Metrics
 }
 
-func newHandlerFunc(name string, h tHttpHandlerFunc) *HandlerFunc {
+func newHandlerFunc(h tHttpHandlerFunc, metrics *Metrics) *HandlerFunc {
 	return &HandlerFunc{
 		h,
-		newMetrics(name),
+		metrics,
 	}
 }
 
 func (proxy *HandlerFunc) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	var startTime time.Time
 	if Enable {
-		startTime = time.Now()
+		startTime := time.Now()
+		defer proxy.metrics.measure(startTime, r)
 	}
 	proxy.Original(w, r)
-	if Enable {
-		defer proxy.measure(startTime, r)
-	}
 }

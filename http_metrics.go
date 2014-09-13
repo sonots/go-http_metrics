@@ -12,13 +12,24 @@ var Verbose = false
 var Enable = true
 
 // a set of proxies
-var proxyHandlerFuncRegistry = make(map[string](*HandlerFunc))
-var proxyHandlerRegistry = make(map[string](*Handler))
+var proxyHandlerFuncRegistry = make(map[*tHttpHandlerFunc](*HandlerFunc))
+var proxyHandlerRegistry = make(map[*http.Handler](*Handler))
+
+// a set of metrics
+var metricsRegistry = make(map[string](*Metrics))
 
 //WrapHandlerFunc  instrument HTTP handler functions to collect HTTP metrics
 func WrapHandlerFunc(name string, h tHttpHandlerFunc) tHttpHandlerFunc {
-	proxy := newHandlerFunc(name, h)
-	proxyHandlerFuncRegistry[name] = proxy
+	metrics := metricsRegistry[name]
+	if metrics == nil {
+		metrics = newMetrics(name)
+		metricsRegistry[name] = metrics
+	}
+	proxy := proxyHandlerFuncRegistry[&h]
+	if proxy == nil {
+		proxy = newHandlerFunc(h, metrics)
+		proxyHandlerFuncRegistry[&h] = proxy
+	}
 	return func(w http.ResponseWriter, r *http.Request) {
 		proxy.ServeHTTP(w, r)
 	}
@@ -26,8 +37,16 @@ func WrapHandlerFunc(name string, h tHttpHandlerFunc) tHttpHandlerFunc {
 
 //WrapHandler  instrument HTTP handler object to collect HTTP metrics
 func WrapHandler(name string, h http.Handler) http.Handler {
-	proxy := newHandler(name, h)
-	proxyHandlerRegistry[name] = proxy
+	metrics := metricsRegistry[name]
+	if metrics == nil {
+		metrics = newMetrics(name)
+		metricsRegistry[name] = metrics
+	}
+	proxy := proxyHandlerRegistry[&h]
+	if proxy == nil {
+		proxy = newHandler(h, metrics)
+		proxyHandlerRegistry[&h] = proxy
+	}
 	return proxy
 }
 
@@ -38,11 +57,8 @@ func Print(duration int) {
 		time.Sleep(timeDuration * time.Second)
 		for {
 			startTime := time.Now()
-			for _, proxy := range proxyHandlerFuncRegistry {
-				proxy.printMetrics(duration)
-			}
-			for _, proxy := range proxyHandlerRegistry {
-				proxy.printMetrics(duration)
+			for _, metrics := range metricsRegistry {
+				metrics.printMetrics(duration)
 			}
 			elapsedTime := time.Now().Sub(startTime)
 			time.Sleep(timeDuration*time.Second - elapsedTime)

@@ -23,7 +23,7 @@ func newMetrics(name string) *Metrics {
 func (proxy *Metrics) measure(startTime time.Time, r *http.Request) {
 	elapsedTime := time.Now().Sub(startTime)
 	proxy.timer.Update(elapsedTime)
-	if Enable && Verbose {
+	if Verbose {
 		proxy.printVerbose(r, elapsedTime)
 	}
 }
