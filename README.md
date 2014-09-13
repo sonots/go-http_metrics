@@ -14,12 +14,13 @@ import (
 
 func main() {
   // http.HandleFunc("/", rootHandleFunc)
-  http.HandleFunc("/", http_metrics.WrapHandleFunc("rootHandleFunc", rootHandleFunc))
+  http.HandleFunc("/", http_metrics.WrapHandlerFunc("rootHandleFunc", rootHandleFunc))
   // http.Handle("/static/", staticHandle)
-  http.Handle("/static/", http_metrics.WrapHandle("staticHandle", staticHandle))
+  http.Handle("/static/", http_metrics.WrapHandler("staticHandle", staticHandle))
 
   http_metrics.Verbose = true // if you want to print on each request
-  http_metrics.Print() // print metrics on each second
+  http_metrics.Print(1) // print metrics on each 1 second
+  // http_metrics.Enable = false // if you want to turn off instrumentation
   http.ListenAndServe("0.0.0.0:5050", nil)
 }
 ```
@@ -27,7 +28,7 @@ func main() {
 Output Example (LTSV format):
 
 ```
-time:2014-09-08 03:27:50.346193673 +0900 JST  handler:rootHandleFunc count:1 max:0.001626    mean:0.001626   min:0.001626    percentile95:0.001626
+time:2014-09-08 03:27:50.346193673 +0900 JST  handler:rootHandleFunc count:1 max:0.001626    mean:0.001626   min:0.001626    percentile95:0.001626    duration:1
 ```
 
 Verbose Output Example (LTSV format):
