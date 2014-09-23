@@ -9,7 +9,7 @@ go-http\_metrics wraps http.Handle or HandleFunc to instrument each http request
 ```go
 import (
   "net/http"
-  http_metrics "github.com/sonots/go-http_metrics"
+  "github.com/sonots/go-http_metrics"
 )
 
 func main() {
@@ -37,7 +37,15 @@ Verbose Output Example (LTSV format):
 time:2014-09-08 03:27:50.346193673 +0900 JST  handler:rootHandleFunc method:GET      path:/    params:foo=bar   elapsed:0.001626
 ```
 
-# Options
+# Others
+
+## Enable
+
+It is possible to diable instrumentation as:
+
+```go
+http_metrics.Enable = false
+```
 
 ## OnRResponse
 
