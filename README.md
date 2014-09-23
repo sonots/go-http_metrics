@@ -37,6 +37,21 @@ Verbose Output Example (LTSV format):
 time:2014-09-08 03:27:50.346193673 +0900 JST  handler:rootHandleFunc method:GET      path:/    params:foo=bar   elapsed:0.001626
 ```
 
+# Options
+
+## OnRResponse
+
+It is possible to set an arbitrary callback called on each response as:
+
+```go
+http_metrics.OnResponse = func() {
+  sql_metrics.Flush()
+  template_metrics.Flush()
+}
+```
+
+This example flushes [sql_metrics](https://github.com/sonots/go-sql_metrics) and [template_metrics](https://github.com/sonots/go-template_metrics) on each request.
+
 # ToDo
 
 * write tests

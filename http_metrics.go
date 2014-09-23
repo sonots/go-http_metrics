@@ -11,6 +11,9 @@ var Verbose = false
 // Set Enable = false to turn off instrumentation
 var Enable = true
 
+// Set Callback func to be called on each response
+var OnResponse func()
+
 // a set of proxies
 var proxyHandlerFuncRegistry = make(map[*tHttpHandlerFunc](*HandlerFunc))
 var proxyHandlerRegistry = make(map[*http.Handler](*Handler))

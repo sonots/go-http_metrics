@@ -23,6 +23,9 @@ func (proxy *HandlerFunc) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if Enable {
 		startTime := time.Now()
 		defer proxy.metrics.measure(startTime, r)
+		if OnResponse != nil {
+			defer OnResponse()
+		}
 	}
 	proxy.Original(w, r)
 }
