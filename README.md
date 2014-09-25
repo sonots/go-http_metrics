@@ -18,8 +18,8 @@ func main() {
   // http.Handle("/static/", staticHandle)
   http.Handle("/static/", http_metrics.WrapHandler("staticHandle", staticHandle))
 
-  http_metrics.Verbose = true // if you want to print on each request
   http_metrics.Print(1) // print metrics on each 1 second
+  // http_metrics.Verbose = true // if you want to print on each request
   // http_metrics.Enable = false // if you want to turn off instrumentation
   http.ListenAndServe("0.0.0.0:5050", nil)
 }
@@ -37,11 +37,27 @@ Verbose Output Example (LTSV format):
 time:2014-09-08 03:27:50.346193673 +0900 JST  handler:rootHandleFunc method:GET      path:/    params:foo=bar   elapsed:0.001626
 ```
 
-# Others
+# API
+
+## Print
+
+Print summarized metrics on each specified second:
+
+```go
+http_metrics.Print(60) # 60 seconds
+```
+
+## Verbose
+
+Print metrics on each request:
+
+```go
+http_metrics.Verbose = true
+```
 
 ## Enable
 
-It is possible to diable instrumentation as:
+Diable instrumentation:
 
 ```go
 http_metrics.Enable = false
@@ -49,7 +65,7 @@ http_metrics.Enable = false
 
 ## OnRResponse
 
-It is possible to set an arbitrary callback called on each response as:
+Set an arbitrary callback called on each response as:
 
 ```go
 http_metrics.OnResponse = func() {
