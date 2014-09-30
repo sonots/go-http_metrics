@@ -63,7 +63,7 @@ Diable instrumentation:
 http_metrics.Enable = false
 ```
 
-## OnRResponse
+## OnResponse
 
 Set an arbitrary callback called on each response as:
 
